@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Creator</title>
+</head>
+<body>
+    <h1>Create a New Project</h1>
+    <form id="projectForm">
+        <label for="projectName">Project Name:</label>
+        <input type="text" id="projectName" name="project_name" required>
+
+        <label for="framework">Select a Framework:</label>
+        <select id="framework" name="framework" required>
+            <option value="vanilla">Vanilla</option>
+            <option value="vue">Vue</option>
+            <option value="react">React</option>
+            <option value="svelte">Svelte</option>
+        </select>
+    </form>
+
+    <button type="submit" id="createProject">Create Project</button>
+
+    <script>
+        document.getElementById('createProject').addEventListener('click', async function (event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const projectName = document.getElementById('projectName').value;
+            const framework = document.getElementById('framework').value;
+
+            const formData = {
+                project_name: projectName,
+                framework: framework,
+            };
+
+            // Send JSON data to the server
+            const response = await fetch('/create-project', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json', // Set the content type to JSON
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (response.ok) {
+                const message = await response.text();
+                console.log(message);
+                alert(message);
+            } else {
+                console.error('Failed to create project:', response.statusText);
+            }
+        });
+    </script>
+</body>
+</html>
