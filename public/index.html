@@ -4,18 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rabbit</title>
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      // Initialize Tailwind with DaisyUI plugin
-      tailwind.config = {
-        theme: {
-          extend: {},
-        },
-        plugins: [daisyui],
-      };
-    </script>
-  
+    <link rel="stylesheet" href="public/styles.css">
     <!-- Optional: Custom Theme (You can add this later or customize DaisyUI themes) -->
     <!-- <link rel="stylesheet" href="./theme.css"> -->
 </head>
@@ -43,10 +32,10 @@
         }
 
         // Load components
-        loadComponent('/static/sidebar.html', 'sidebar');
-        loadComponent('static/header.html', 'header');
-        loadComponent('static/content.html', 'content');
-        loadComponent('static/footer.html', 'footer');
+        loadComponent('public/sidebar.html', 'sidebar');
+        loadComponent('public/header.html', 'header');
+        loadComponent('public/content.html', 'content');
+        loadComponent('public/footer.html', 'footer');
     </script>
 </body>
 </html>

@@ -9,6 +9,7 @@ use std::{fs, io::Write, path::Path};
 use std::{io::Read, process::Command};
 use tokio::{fs::File, io::AsyncReadExt};
 use tower_http::services::ServeDir;
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use zip::{write::SimpleFileOptions, ZipWriter};
 
 #[derive(Deserialize)]
@@ -19,6 +20,13 @@ struct ProjectForm {
 
 #[tokio::main]
 async fn main() -> Result<(), ()> {
+    tracing_subscriber::registry()
+        .with(
+            tracing_subscriber::EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| "trace".into()),
+        )
+        .with(tracing_subscriber::fmt::layer())
+        .init();
     let projects_path = format!("../projects/");
     // Create the projects directory if it doesn't exist
     if let Err(error) = fs::create_dir_all(&projects_path) {
@@ -28,11 +36,14 @@ async fn main() -> Result<(), ()> {
 
     let app = Router::new()
         .route("/", get(root))
-        .nest_service("/static", ServeDir::new("src/static"))
+        .nest_service("/public", ServeDir::new("public"))
         .route("/create-project", axum::routing::post(create_project))
         .route("/download/:project_name", get(download_project));
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
+        .await
+        .unwrap();
+    tracing::debug!("listening on http://{}", listener.local_addr().unwrap());
     axum::serve(listener, app).await.unwrap();
 
     Ok(())
@@ -40,7 +51,12 @@ async fn main() -> Result<(), ()> {
 
 // Serve the HTML form
 async fn root() -> impl IntoResponse {
-    Html(fs::read_to_string("src/static/index.html").unwrap())
+    let index_html = fs::read_to_string("public/index.html");
+    if let Ok(index_html) = index_html {
+        Html(index_html)
+    } else {
+        Html("Unable to load page content".to_string())
+    }
 }
 
 // Handle project creation (expecting JSON data)
