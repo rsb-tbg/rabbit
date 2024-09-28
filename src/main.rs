@@ -8,6 +8,7 @@ use serde::Deserialize;
 use std::{fs, io::Write, path::Path};
 use std::{io::Read, process::Command};
 use tokio::{fs::File, io::AsyncReadExt};
+use tower_http::services::ServeDir;
 use zip::{write::SimpleFileOptions, ZipWriter};
 
 #[derive(Deserialize)]
@@ -27,6 +28,7 @@ async fn main() -> Result<(), ()> {
 
     let app = Router::new()
         .route("/", get(root))
+        .nest_service("/static", ServeDir::new("src/static"))
         .route("/create-project", axum::routing::post(create_project))
         .route("/download/:project_name", get(download_project));
 
@@ -38,7 +40,7 @@ async fn main() -> Result<(), ()> {
 
 // Serve the HTML form
 async fn root() -> impl IntoResponse {
-    Html(fs::read_to_string("./index.html").unwrap())
+    Html(fs::read_to_string("src/static/index.html").unwrap())
 }
 
 // Handle project creation (expecting JSON data)

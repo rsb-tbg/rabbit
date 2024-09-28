@@ -1,0 +1,54 @@
+<div class="card card-bordered w-1/2">
+    <div class="card-body">
+        <h2 class="card-title">Create a New Project</h2>
+        <form id="projectForm">
+            <div class="form-control">
+                <label for="projectName" class="label">Project Name:</label>
+                <input type="text" id="projectName" name="project_name" required class="input input-bordered" />
+            </div>
+            <div class="form-control mt-4">
+                <label for="framework" class="label">Select a Framework:</label>
+                <select id="framework" name="framework" required class="select select-bordered">
+                    <option value="vanilla">Vanilla</option>
+                    <option value="vue">Vue</option>
+                    <option value="react">React</option>
+                    <option value="svelte">Svelte</option>
+                </select>
+            </div>
+            <div class="card-actions justify-end mt-4">
+                <button type="submit" id="createProject" class="btn btn-primary">Create Project</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.getElementById('createProject').addEventListener('click', async function (event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        const projectName = document.getElementById('projectName').value;
+        const framework = document.getElementById('framework').value;
+
+        const formData = {
+            project_name: projectName,
+            framework: framework,
+        };
+
+        // Send JSON data to the server
+        const response = await fetch('/create-project', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json', // Set the content type to JSON
+            },
+            body: JSON.stringify(formData),
+        });
+
+        if (response.ok) {
+            const message = await response.text();
+            console.log(message);
+            alert(message);
+        } else {
+            console.error('Failed to create project:', response.statusText);
+        }
+    });
+</script>
