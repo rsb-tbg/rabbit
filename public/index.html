@@ -20,22 +20,51 @@
 
 
     <script>
-        function loadComponent(url, elementId) {
-            fetch(url)
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById(elementId).innerHTML = html;
-                })
-                .catch(err => {
-                    console.error(`Error loading ${url}:`, err);
-                });
+        async function loadComponent(url, elementId) {
+            try {
+                const response = await fetch(url);
+                const html = await response.text();
+                document.getElementById(elementId).innerHTML = html;
+
+                // Check for theme toggle after loading footer
+                if (elementId === 'footer') {
+                    handleThemeToggle();
+                }
+            } catch (err) {
+                console.error(`Error loading ${url}:`, err);
+            }
         }
 
         // Load components
-        loadComponent('public/sidebar.html', 'sidebar');
-        loadComponent('public/header.html', 'header');
-        loadComponent('public/content.html', 'content');
-        loadComponent('public/footer.html', 'footer');
+        (async () => {
+            await loadComponent('public/sidebar.html', 'sidebar');
+            await loadComponent('public/header.html', 'header');
+            await loadComponent('public/content.html', 'content');
+            await loadComponent('public/footer.html', 'footer');
+        })();
+
+        function handleThemeToggle() {
+            // Theme toggle handling
+            const themeToggle = document.querySelector('.theme-controller');
+            
+            // Check local storage for saved theme
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                if (themeToggle) {
+                    themeToggle.checked = savedTheme === 'cupcake'; // Adjust based on your themes
+                }
+            }
+
+            // Event listener for the checkbox
+            if (themeToggle) {
+                themeToggle.addEventListener('change', (event) => {
+                    const theme = event.target.checked ? 'cupcake' : 'synthwave'; // Adjust based on your themes
+                    document.documentElement.setAttribute('data-theme', theme);
+                    localStorage.setItem('theme', theme);
+                });
+            }
+        }
     </script>
 </body>
 </html>
